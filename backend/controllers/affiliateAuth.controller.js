@@ -1,7 +1,7 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { z } = require('zod');
-const Affiliate = require('../models/Affiliate');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { z } from 'zod';
+import Affiliate from '../models/Affiliate.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_fallback_secret_key';
 
@@ -13,7 +13,7 @@ const signupSchema = z.object({
     zelleInfo: z.union([z.string(), z.literal(''), z.undefined()]).optional(),
 });
 
-exports.affiliateSignup = async (req, res) => {
+export const affiliateSignup = async (req, res) => {
     const result = signupSchema.safeParse(req.body);
     if (!result.success) {
         return res.status(400).json({ error: 'Validation failed', details: result.error.flatten().fieldErrors });
@@ -41,7 +41,7 @@ exports.affiliateSignup = async (req, res) => {
     }
 };
 
-exports.affiliateLogin = async (req, res) => {
+export const affiliateLogin = async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).json({ error: 'Email and password are required.' });
@@ -72,8 +72,15 @@ exports.affiliateLogin = async (req, res) => {
             { expiresIn: '7d' }
         );
 
+        // Set cookie
+        res.cookie('affiliate_token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
         return res.json({
-            token,
             affiliate: {
                 id: affiliate._id,
                 name: affiliate.name,
@@ -87,3 +94,5 @@ exports.affiliateLogin = async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+export default { affiliateSignup, affiliateLogin };

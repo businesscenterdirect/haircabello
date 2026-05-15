@@ -1,5 +1,5 @@
-const cloudinary = require('cloudinary').v2;
-const multer = require('multer');
+import { v2 as cloudinary } from 'cloudinary';
+import multer from 'multer';
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -46,13 +46,17 @@ const uploadToCloudinary = (req, res, next) => {
         });
 };
 
-module.exports = {
-    array: (fieldname, maxCount) => [
-        multerUpload.array(fieldname, maxCount),
-        uploadToCloudinary
-    ],
-    single: (fieldname) => [
-        multerUpload.single(fieldname),
-        uploadToCloudinary
-    ]
+export const array = (fieldname, maxCount) => [
+    multerUpload.array(fieldname, maxCount),
+    uploadToCloudinary
+];
+
+export const single = (fieldname) => [
+    multerUpload.single(fieldname),
+    uploadToCloudinary
+];
+
+export default {
+    array,
+    single
 };

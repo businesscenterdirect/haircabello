@@ -1,6 +1,6 @@
-const User = require('../models/User');
+import User from '../models/User.js';
 
-exports.getDashboardStats = async (req, res) => {
+export const getDashboardStats = async (req, res) => {
     try {
         const totalActiveMembers = await User.countDocuments({
             subscriptionStatus: 'active',
@@ -59,3 +59,5 @@ exports.getDashboardStats = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+export default { getDashboardStats };

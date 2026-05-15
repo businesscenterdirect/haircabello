@@ -1,11 +1,11 @@
-const Stripe = require('stripe');
-const User = require('../models/User');
+import Stripe from 'stripe';
+import User from '../models/User.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2023-10-16',
 });
 
-exports.handleWebhook = async (req, res) => {
+export const handleWebhook = async (req, res) => {
 
     console.log("\n================ STRIPE WEBHOOK RECEIVED ================");
     console.log("Time:", new Date().toISOString());
@@ -165,7 +165,7 @@ exports.handleWebhook = async (req, res) => {
     res.json({ received: true });
 };
 
-exports.getSessionDetails = async (req, res) => {
+export const getSessionDetails = async (req, res) => {
     const { sessionId } = req.params;
     try {
         const session = await stripe.checkout.sessions.retrieve(sessionId);
@@ -191,7 +191,7 @@ exports.getSessionDetails = async (req, res) => {
     }
 };
 
-exports.createBillingPortal = async (req, res) => {
+export const createBillingPortal = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
         if (!user || !user.stripeCustomerId) {
@@ -209,3 +209,5 @@ exports.createBillingPortal = async (req, res) => {
         res.status(500).json({ error: 'Failed to create billing portal' });
     }
 };
+
+export default { handleWebhook, getSessionDetails, createBillingPortal };

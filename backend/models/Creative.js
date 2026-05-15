@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const CreativeSchema = new mongoose.Schema({
     title: {
@@ -21,4 +21,4 @@ const CreativeSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model('Creative', CreativeSchema);
+export default mongoose.model('Creative', CreativeSchema);

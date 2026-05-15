@@ -1,16 +1,16 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const User = require('../models/User');
+import 'dotenv/config';
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import User from '../models/User.js';
 
 const createAdmin = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI);
         console.log('Connected to MongoDB...');
 
-        const email = 'admin@gmail.com';
-        const password = 'Password123'; // You should change this later
-        const fullName = 'System Administrator';
+        const email = 'amanbsoftiatric@gmail.com';
+        const password = 'Password123'; 
+        const fullName = 'Aman B';
 
         // Check if admin already exists
         const existingAdmin = await User.findOne({ email });
@@ -32,9 +32,9 @@ const createAdmin = async () => {
             password: hashedPassword,
             phone: '000-000-0000',
             serviceAddress: 'System HQ',
-            plan: 'premium', // Default just in case
-            subscriptionStatus: 'active',
             role: 'admin',
+            plan: 'essential', // Required by schema
+            subscriptionStatus: 'active',
             forcePasswordChange: false
         });
 

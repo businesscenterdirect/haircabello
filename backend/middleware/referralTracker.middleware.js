@@ -1,11 +1,11 @@
-const Affiliate = require('../models/Affiliate');
+import Affiliate from '../models/Affiliate.js';
 
 /**
  * Reads ?ref=<referralCode> from the query string.
  * If a valid affiliate is found, sets req.affiliateRef = affiliate doc.
  * Also reads la_ref from cookies as fallback.
  */
-module.exports = async (req, res, next) => {
+export default async (req, res, next) => {
     try {
         const refCode = req.query.ref || (req.cookies && req.cookies.la_ref);
         if (!refCode) return next();

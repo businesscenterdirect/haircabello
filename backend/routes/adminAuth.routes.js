@@ -1,8 +1,12 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const adminAuthController = require('../controllers/adminAuth.controller');
+import adminAuthController from '../controllers/adminAuth.controller.js';
 
 // Admin Login
 router.post('/login', adminAuthController.login);
+router.post('/logout', (req, res) => {
+    res.clearCookie('admin_token');
+    res.json({ message: 'Logged out successfully' });
+});
 
-module.exports = router;
+export default router;

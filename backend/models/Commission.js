@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const CommissionSchema = new mongoose.Schema({
     affiliateId: {
@@ -27,4 +27,4 @@ const CommissionSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model('Commission', CommissionSchema);
+export default mongoose.model('Commission', CommissionSchema);

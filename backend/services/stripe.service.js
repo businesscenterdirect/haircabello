@@ -1,10 +1,10 @@
-const Stripe = require('stripe');
+import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2023-10-16',
 });
 
-const createCheckoutSession = async (customerData, priceId) => {
+export const createCheckoutSession = async (customerData, priceId) => {
     const session = await stripe.checkout.sessions.create({
         mode: 'subscription',
         payment_method_types: ['card'],
@@ -24,12 +24,12 @@ const createCheckoutSession = async (customerData, priceId) => {
     return session;
 };
 
-const verifySession = async (sessionId) => {
+export const verifySession = async (sessionId) => {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     return session;
 };
 
-module.exports = {
+export default {
     createCheckoutSession,
     verifySession,
     stripe

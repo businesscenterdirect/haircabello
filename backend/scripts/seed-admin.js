@@ -1,8 +1,13 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
-const User = require('../models/User');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import 'dotenv/config'; // Usually defaults to .env in root if run from root
+import User from '../models/User.js';
+
+// ESM __dirname replacement
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const MONGO_URI = process.env.MONGO_URI;
 

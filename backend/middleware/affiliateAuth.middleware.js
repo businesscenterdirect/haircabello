@@ -1,14 +1,12 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_fallback_secret_key';
 
-module.exports = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
+export default (req, res, next) => {
+    const token = req.cookies.affiliate_token;
+    if (!token) {
         return res.status(401).json({ error: 'No token provided' });
     }
-
-    const token = authHeader.split(' ')[1];
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
 

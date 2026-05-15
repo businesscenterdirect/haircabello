@@ -14,7 +14,6 @@ const AdminLogin = () => {
         setLoading(true);
         try {
             const data = await adminLogin(formData);
-            localStorage.setItem('admin_token', data.token);
             localStorage.setItem('admin_user', JSON.stringify(data.user));
 
             toast.success("Welcome, Administrator");

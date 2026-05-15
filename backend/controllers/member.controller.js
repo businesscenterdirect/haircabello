@@ -1,11 +1,12 @@
-const Stripe = require('stripe');
-const User = require('../models/User');
+import Stripe from 'stripe';
+import User from '../models/User.js';
+import AuditLog from '../models/AuditLog.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2023-10-16',
 });
 
-exports.getMe = async (req, res) => {
+export const getMe = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ error: 'User not found' });
@@ -16,7 +17,7 @@ exports.getMe = async (req, res) => {
     }
 };
 
-exports.updateNextOrderPreferences = async (req, res) => {
+export const updateNextOrderPreferences = async (req, res) => {
     try {
         const { hairLength, hairType, gifts } = req.body;
         
@@ -46,7 +47,7 @@ exports.updateNextOrderPreferences = async (req, res) => {
     }
 };
 
-exports.memberCancelSubscription = async (req, res) => {
+export const memberCancelSubscription = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ error: 'User not found' });
@@ -65,9 +66,7 @@ exports.memberCancelSubscription = async (req, res) => {
     }
 };
 
-const AuditLog = require('../models/AuditLog');
-
-exports.getAllMembers = async (req, res) => {
+export const getAllMembers = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 25;
@@ -93,7 +92,7 @@ exports.getAllMembers = async (req, res) => {
     }
 };
 
-exports.getMemberById = async (req, res) => {
+export const getMemberById = async (req, res) => {
     try {
         const member = await User.findOne({ _id: req.params.id, role: 'member' });
         if (!member) return res.status(404).json({ error: 'Member not found' });
@@ -104,7 +103,7 @@ exports.getMemberById = async (req, res) => {
     }
 };
 
-exports.cancelSubscription = async (req, res) => {
+export const cancelSubscription = async (req, res) => {
     try {
         const member = await User.findOne({ _id: req.params.id, role: 'member' });
         if (!member) return res.status(404).json({ error: 'Member not found' });
@@ -129,4 +128,13 @@ exports.cancelSubscription = async (req, res) => {
         console.error('Error canceling subscription:', error);
         res.status(500).json({ error: 'Failed to cancel subscription' });
     }
+};
+
+export default {
+    getMe,
+    updateNextOrderPreferences,
+    memberCancelSubscription,
+    getAllMembers,
+    getMemberById,
+    cancelSubscription
 };

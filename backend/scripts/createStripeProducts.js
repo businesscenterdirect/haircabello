@@ -8,8 +8,8 @@
  * After running, copy the printed IDs into your .env file.
  */
 
-require('dotenv').config();
-const Stripe = require('stripe');
+import 'dotenv/config';
+import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2023-10-16',

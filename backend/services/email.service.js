@@ -1,8 +1,8 @@
-const { Resend } = require('resend');
+import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-exports.sendWelcomeEmail = async (to, { name, password, plan, price, hairLength, hairType, gifts }) => {
+export const sendWelcomeEmail = async (to, { name, password, plan, price, hairLength, hairType, gifts }) => {
     const isProduction = process.env.NODE_ENV === 'production';
     
     const giftsList = gifts?.length > 0 
@@ -58,4 +58,6 @@ exports.sendWelcomeEmail = async (to, { name, password, plan, price, hairLength,
     } catch (error) {
         console.error('Failed to send welcome email:', error);
     }
-}
+};
+
+export default { sendWelcomeEmail };

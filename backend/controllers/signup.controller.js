@@ -1,9 +1,10 @@
-const { z } = require('zod');
-const Stripe = require('stripe');
-const User = require('../models/User');
-const Affiliate = require('../models/Affiliate');
-const Referral = require('../models/Referral');
-const Commission = require('../models/Commission');
+import { z } from 'zod';
+import Stripe from 'stripe';
+import User from '../models/User.js';
+import Affiliate from '../models/Affiliate.js';
+import Referral from '../models/Referral.js';
+import Commission from '../models/Commission.js';
+import bcrypt from 'bcryptjs';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2023-10-16',
@@ -39,7 +40,7 @@ const GIFT_LIMITS = {
     luxury: 5
 };
 
-exports.startSignup = async (req, res) => {
+export const startSignup = async (req, res) => {
     // 1. Validate request body
     const parseResult = signupSchema.safeParse(req.body);
     if (!parseResult.success) {
@@ -95,7 +96,6 @@ exports.startSignup = async (req, res) => {
         // 4. Save preliminary user record BEFORE checkout
         console.log("Creating checkout session for:", email);
 
-        const bcrypt = require('bcryptjs');
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = new User({
@@ -154,3 +154,5 @@ exports.startSignup = async (req, res) => {
         return res.status(500).json({ error: 'Stripe session creation failed' });
     }
 };
+
+export default { startSignup };

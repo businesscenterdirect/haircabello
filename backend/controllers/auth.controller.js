@@ -1,10 +1,10 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_fallback_secret_key';
 
-exports.register = async (req, res) => {
+export const register = async (req, res) => {
     try {
         const { email, password, fullName, phone, serviceAddress, plan } = req.body;
 
@@ -39,14 +39,22 @@ exports.register = async (req, res) => {
         // Generate token with role
         const token = jwt.sign({ id: user._id, email: user.email, role: user.role || 'member' }, JWT_SECRET, { expiresIn: '7d' });
 
-        res.status(201).json({ token, user: { id: user._id, email: user.email, fullName: user.fullName, role: user.role || 'member' } });
+        // Set cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
+        res.status(201).json({ user: { id: user._id, email: user.email, fullName: user.fullName, role: user.role || 'member' } });
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
 
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -79,8 +87,15 @@ exports.login = async (req, res) => {
 
         const token = jwt.sign({ id: user._id, email: user.email, role: user.role || 'member' }, JWT_SECRET, { expiresIn: '7d' });
 
+        // Set cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
         res.json({
-            token,
             user: {
                 id: user._id,
                 email: user.email,
@@ -95,7 +110,7 @@ exports.login = async (req, res) => {
     }
 };
 
-exports.updatePassword = async (req, res) => {
+export const updatePassword = async (req, res) => {
     try {
         const { newPassword } = req.body;
         if (!newPassword || newPassword.length < 8) {
@@ -114,4 +129,6 @@ exports.updatePassword = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+export default { register, login, updatePassword };
 

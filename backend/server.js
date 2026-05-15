@@ -1,9 +1,9 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 
 // --- STRICT ENVIRONMENT VALIDATION ---
 const requiredEnv = [
@@ -20,12 +20,12 @@ requiredEnv.forEach(env => {
 });
 
 // Import Routes
-const signupRoutes = require('./routes/signup.routes');
-const stripeRoutes = require('./routes/stripe.routes');
-const authRoutes = require('./routes/auth.routes');
-const memberPortalRoutes = require('./routes/memberPortal.routes');
-const adminAuthRoutes = require('./routes/adminAuth.routes');
-const phase3AdminRoutes = require('./routes/admin.routes');
+import signupRoutes from './routes/signup.routes.js';
+import stripeRoutes from './routes/stripe.routes.js';
+import authRoutes from './routes/auth.routes.js';
+import memberPortalRoutes from './routes/memberPortal.routes.js';
+import adminAuthRoutes from './routes/adminAuth.routes.js';
+import phase3AdminRoutes from './routes/admin.routes.js';
 
 const app = express();
 
@@ -39,7 +39,7 @@ app.use(cors({
     credentials: true
 }));
 
-const { generalLimiter, authLimiter } = require('./middleware/rateLimiter');
+import { generalLimiter, authLimiter } from './middleware/rateLimiter.js';
 
 // Mount Stripe routes BEFORE express.json() to allow raw body for webhooks
 app.use('/api/stripe', stripeRoutes);
@@ -79,7 +79,7 @@ const connectDB = async () => {
 connectDB();
 // -----------------------------------------------------------
 
-const adminAuth = require('./middleware/adminAuth.middleware');
+import adminAuth from './middleware/adminAuth.middleware.js';
 
 // Routes
 app.use('/api/signup', signupRoutes);

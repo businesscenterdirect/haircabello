@@ -26,22 +26,19 @@ import { Affiliates as AdminAffiliates, Settings as AdminSettings } from "./page
 
 // Auth Guard Component
 const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode, requiredRole?: 'admin' | 'member' }) => {
-  const adminToken = localStorage.getItem('admin_token');
-  const memberToken = localStorage.getItem('token');
   const adminUser = JSON.parse(localStorage.getItem('admin_user') || '{}');
   const memberUser = JSON.parse(localStorage.getItem('user') || '{}');
 
   if (requiredRole === 'admin') {
-    if (!adminToken) return <Navigate to="/admin/login" replace />;
-    if (adminUser.role !== 'admin') return <Navigate to="/login" replace />;
+    if (!adminUser.id || adminUser.role !== 'admin') return <Navigate to="/admin/login" replace />;
     return <>{children}</>;
   }
 
   if (requiredRole === 'member') {
-    // Admins are allowed to view member routes as well (Improvement 1)
-    if (!memberToken && !adminToken) return <Navigate to="/login" replace />;
+    // Admins are allowed to view member routes as well
+    if (!memberUser.id && !adminUser.id) return <Navigate to="/login" replace />;
 
-    const currentUser = adminToken ? adminUser : memberUser;
+    const currentUser = adminUser.id ? adminUser : memberUser;
     // Basic check to ensure at least one valid session is active
     if (!currentUser.role) return <Navigate to="/login" replace />;
 
@@ -53,8 +50,8 @@ const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode,
 
 // Affiliate Auth Guard
 const AffiliateProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const token = localStorage.getItem('affiliate_token');
-  if (!token) return <Navigate to="/affiliate/login" replace />;
+  const affiliateUser = JSON.parse(localStorage.getItem('affiliate_user') || '{}');
+  if (!affiliateUser.id) return <Navigate to="/affiliate/login" replace />;
   return <>{children}</>;
 };
 

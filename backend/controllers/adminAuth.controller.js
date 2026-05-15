@@ -1,10 +1,10 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_fallback_secret_key';
 
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -13,7 +13,7 @@ exports.login = async (req, res) => {
 
         if (!user) {
             return res.status(401).json({ error: 'Invalid email or password' });
-        }``
+        }
 
         // 2. Verify role is admin
         if (user.role !== 'admin') {
@@ -33,8 +33,15 @@ exports.login = async (req, res) => {
             { expiresIn: '7d' }
         );
 
+        // Set cookie
+        res.cookie('admin_token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
         res.json({
-            token,
             user: {
                 id: user._id,
                 email: user.email,
@@ -47,3 +54,5 @@ exports.login = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+export default { login };

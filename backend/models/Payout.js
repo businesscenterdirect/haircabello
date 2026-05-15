@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const PayoutSchema = new mongoose.Schema({
     affiliateId: {
@@ -34,4 +34,4 @@ const PayoutSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model('Payout', PayoutSchema);
+export default mongoose.model('Payout', PayoutSchema);

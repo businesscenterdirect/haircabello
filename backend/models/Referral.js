@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const ReferralSchema = new mongoose.Schema({
     affiliateId: {
@@ -25,4 +25,4 @@ const ReferralSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model('Referral', ReferralSchema);
+export default mongoose.model('Referral', ReferralSchema);

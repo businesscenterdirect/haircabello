@@ -1,11 +1,11 @@
-const Affiliate = require('../models/Affiliate');
-const Referral = require('../models/Referral');
-const Commission = require('../models/Commission');
-const Payout = require('../models/Payout');
-const Creative = require('../models/Creative');
+import Affiliate from '../models/Affiliate.js';
+import Referral from '../models/Referral.js';
+import Commission from '../models/Commission.js';
+import Payout from '../models/Payout.js';
+import Creative from '../models/Creative.js';
 
 // GET /api/admin/affiliates
-exports.getAllAffiliates = async (req, res) => {
+export const getAllAffiliates = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 25;
@@ -37,7 +37,7 @@ exports.getAllAffiliates = async (req, res) => {
 };
 
 // PATCH /api/admin/affiliates/:id/status
-exports.updateAffiliateStatus = async (req, res) => {
+export const updateAffiliateStatus = async (req, res) => {
     try {
         const { status } = req.body;
         if (!['approved', 'rejected', 'pending'].includes(status)) {
@@ -53,7 +53,7 @@ exports.updateAffiliateStatus = async (req, res) => {
 };
 
 // GET /api/admin/affiliates/:id
-exports.getAffiliateDetail = async (req, res) => {
+export const getAffiliateDetail = async (req, res) => {
     try {
         const affiliate = await Affiliate.findById(req.params.id).select('-password');
         if (!affiliate) return res.status(404).json({ error: 'Affiliate not found' });
@@ -72,7 +72,7 @@ exports.getAffiliateDetail = async (req, res) => {
 };
 
 // PATCH /api/admin/commissions/:id/status
-exports.updateCommissionStatus = async (req, res) => {
+export const updateCommissionStatus = async (req, res) => {
     try {
         const { status } = req.body;
         if (!['pending', 'approved', 'paid'].includes(status)) {
@@ -116,7 +116,7 @@ exports.updateCommissionStatus = async (req, res) => {
 };
 
 // POST /api/admin/affiliates/:id/bulk-commissions
-exports.bulkUpdateCommissions = async (req, res) => {
+export const bulkUpdateCommissions = async (req, res) => {
     try {
         const { commissionIds, status, method, notes } = req.body;
         if (!Array.isArray(commissionIds) || !status) {
@@ -161,7 +161,7 @@ exports.bulkUpdateCommissions = async (req, res) => {
 };
 
 // POST /api/admin/affiliates/:id/payouts
-exports.createPayout = async (req, res) => {
+export const createPayout = async (req, res) => {
     try {
         const { amount, method, notes } = req.body;
         if (!amount || !method) {
@@ -186,7 +186,7 @@ exports.createPayout = async (req, res) => {
 };
 
 // PATCH /api/admin/payouts/:id
-exports.markPayoutPaid = async (req, res) => {
+export const markPayoutPaid = async (req, res) => {
     try {
         const { method } = req.body;
         const updateData = { status: 'paid', paidAt: new Date() };
@@ -208,7 +208,7 @@ exports.markPayoutPaid = async (req, res) => {
 };
 
 // GET /api/admin/payouts
-exports.getAllPayouts = async (req, res) => {
+export const getAllPayouts = async (req, res) => {
     try {
         const payouts = await Payout.find()
             .sort({ createdAt: -1 })
@@ -221,7 +221,7 @@ exports.getAllPayouts = async (req, res) => {
 };
 
 // POST /api/admin/creatives
-exports.createCreative = async (req, res) => {
+export const createCreative = async (req, res) => {
     try {
         const { title, fileUrl, fileType } = req.body;
         if (!title || !fileUrl) {
@@ -237,7 +237,7 @@ exports.createCreative = async (req, res) => {
 };
 
 // DELETE /api/admin/creatives/:id
-exports.deleteCreative = async (req, res) => {
+export const deleteCreative = async (req, res) => {
     try {
         const creative = await Creative.findByIdAndDelete(req.params.id);
         if (!creative) return res.status(404).json({ error: 'Creative not found' });
@@ -249,7 +249,7 @@ exports.deleteCreative = async (req, res) => {
 };
 
 // GET /api/admin/creatives
-exports.getAllCreatives = async (req, res) => {
+export const getAllCreatives = async (req, res) => {
     try {
         const creatives = await Creative.find().sort({ uploadedAt: -1 });
         return res.json(creatives);
@@ -257,4 +257,18 @@ exports.getAllCreatives = async (req, res) => {
         console.error('[AffiliateAdmin.getCreatives]', err);
         return res.status(500).json({ error: 'Internal server error' });
     }
+};
+
+export default {
+    getAllAffiliates,
+    updateAffiliateStatus,
+    getAffiliateDetail,
+    updateCommissionStatus,
+    bulkUpdateCommissions,
+    createPayout,
+    markPayoutPaid,
+    getAllPayouts,
+    createCreative,
+    deleteCreative,
+    getAllCreatives
 };

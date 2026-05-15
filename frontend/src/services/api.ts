@@ -20,6 +20,7 @@ export async function startSignup(payload: SignupPayload): Promise<SignupRespons
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
+        credentials: 'include'
     });
 
     if (!res.ok) {
@@ -42,7 +43,9 @@ export interface SessionDetails {
 }
 
 export async function getSessionDetails(sessionId: string): Promise<SessionDetails> {
-    const res = await fetch(`${API_BASE}/api/stripe/session/${sessionId}`);
+    const res = await fetch(`${API_BASE}/api/stripe/session/${sessionId}`, {
+        credentials: 'include'
+    });
 
     if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
@@ -53,14 +56,13 @@ export async function getSessionDetails(sessionId: string): Promise<SessionDetai
 }
 
 export async function updateNextOrderPreferences(data: { hairLength?: string, hairType?: string, gifts?: string[] }) {
-    const token = localStorage.getItem('token');
     const res = await fetch(`${API_BASE}/api/member/next-order`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data),
+        credentials: 'include'
     });
     if (!res.ok) {
         const error = await res.json();
@@ -70,10 +72,9 @@ export async function updateNextOrderPreferences(data: { hairLength?: string, ha
 }
 
 export async function createBillingPortal(): Promise<{ url: string }> {
-    const token = localStorage.getItem('token');
     const res = await fetch(`${API_BASE}/api/member/billing-portal`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include'
     });
     if (!res.ok) {
         const error = await res.json();
@@ -88,6 +89,7 @@ export async function login(credentials: any) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
+        credentials: 'include'
     });
     if (!res.ok) {
         const error = await res.json();
@@ -97,33 +99,53 @@ export async function login(credentials: any) {
 }
 
 export async function getMyProfile() {
-    const token = localStorage.getItem('token');
     const res = await fetch(`${API_BASE}/api/member/me`, {
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include'
     });
-    if (!res.ok) throw new Error('Failed to fetch profile');
+    if (!res.ok) {
+        if (res.status === 401) logout();
+        throw new Error('Failed to fetch profile');
+    }
     return res.json();
 }
 
+export async function logout() {
+    try {
+        await fetch(`${API_BASE}/api/auth/logout`, { method: 'POST', credentials: 'include' });
+    } finally {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+    }
+}
+
+export async function adminLogout() {
+    try {
+        await fetch(`${API_BASE}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    } finally {
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_user');
+        window.location.href = '/admin/login';
+    }
+}
+
 export async function memberCancelSelf() {
-    const token = localStorage.getItem('token');
     const res = await fetch(`${API_BASE}/api/member/cancel`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include'
     });
     if (!res.ok) throw new Error('Failed to cancel subscription');
     return res.json();
 }
 
 export const changePassword = async (newPassword: string): Promise<{ message: string }> => {
-    const token = localStorage.getItem('token');
     const response = await fetch(`${API_BASE}/api/auth/update-password`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ newPassword }),
+        credentials: 'include'
     });
 
     if (!response.ok) {
@@ -140,6 +162,7 @@ export async function adminLogin(credentials: any) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
+        credentials: 'include'
     });
     if (!res.ok) {
         const error = await res.json();
@@ -149,65 +172,65 @@ export async function adminLogin(credentials: any) {
 }
 
 export async function getDashboardStats() {
-    const token = localStorage.getItem('admin_token');
     const res = await fetch(`${API_BASE}/api/admin/ph3/dashboard`, {
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include'
     });
-    if (!res.ok) throw new Error('Failed to fetch dashboard stats');
+    if (!res.ok) {
+        if (res.status === 401) adminLogout();
+        throw new Error('Failed to fetch dashboard stats');
+    }
     return res.json();
 }
 
 export async function getMembers() {
-    const token = localStorage.getItem('admin_token');
     const res = await fetch(`${API_BASE}/api/members`, {
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include'
     });
-    if (!res.ok) throw new Error('Failed to fetch members');
+    if (!res.ok) {
+        if (res.status === 401) adminLogout();
+        throw new Error('Failed to fetch members');
+    }
     return res.json();
 }
 
 export async function getMemberById(id: string) {
-    const token = localStorage.getItem('admin_token');
     const res = await fetch(`${API_BASE}/api/members/${id}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include'
     });
     if (!res.ok) throw new Error('Failed to fetch member');
     return res.json();
 }
 
 export async function updateMember(id: string, data: any) {
-    const token = localStorage.getItem('admin_token');
     const res = await fetch(`${API_BASE}/api/members/${id}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data),
+        credentials: 'include'
     });
     if (!res.ok) throw new Error('Failed to update member');
     return res.json();
 }
 
 export async function cancelSubscription(id: string) {
-    const token = localStorage.getItem('admin_token');
     const res = await fetch(`${API_BASE}/api/members/${id}/cancel`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include'
     });
     if (!res.ok) throw new Error('Failed to cancel subscription');
     return res.json();
 }
 
 export async function addMemberNote(id: string, data: { note: string }) {
-    const token = localStorage.getItem('admin_token');
     const res = await fetch(`${API_BASE}/api/members/${id}/note`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data),
+        credentials: 'include'
     });
     if (!res.ok) throw new Error('Failed to add member note');
     return res.json();

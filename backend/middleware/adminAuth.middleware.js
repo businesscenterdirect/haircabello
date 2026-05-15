@@ -1,17 +1,15 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_fallback_secret_key';
 
 const adminAuth = async (req, res, next) => {
     try {
-        // 1. Get token from header
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        // 1. Get token from cookies
+        const token = req.cookies.admin_token;
+        if (!token) {
             return res.status(401).json({ error: 'Authentication required' });
         }
-
-        const token = authHeader.split(' ')[1];
 
         // 2. Verify token
         const decoded = jwt.verify(token, JWT_SECRET);
@@ -30,4 +28,4 @@ const adminAuth = async (req, res, next) => {
     }
 };
 
-module.exports = adminAuth;
+export default adminAuth;

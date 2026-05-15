@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const adminAuth = require('../middleware/adminAuth.middleware');
-const ctrl = require('../controllers/affiliateAdmin.controller');
+import adminAuth from '../middleware/adminAuth.middleware.js';
+import ctrl from '../controllers/affiliateAdmin.controller.js';
 
 // All routes require admin auth
 router.use(adminAuth);
@@ -25,4 +25,4 @@ router.get('/creatives/all', ctrl.getAllCreatives);
 router.post('/creatives', ctrl.createCreative);
 router.delete('/creatives/:id', ctrl.deleteCreative);
 
-module.exports = router;
+export default router;

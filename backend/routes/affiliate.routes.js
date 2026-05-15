@@ -1,12 +1,16 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const affiliateAuth = require('../middleware/affiliateAuth.middleware');
-const authController = require('../controllers/affiliateAuth.controller');
-const portalController = require('../controllers/affiliatePortal.controller');
+import affiliateAuth from '../middleware/affiliateAuth.middleware.js';
+import authController from '../controllers/affiliateAuth.controller.js';
+import portalController from '../controllers/affiliatePortal.controller.js';
 
 // Public
 router.post('/signup', authController.affiliateSignup);
 router.post('/login', authController.affiliateLogin);
+router.post('/logout', (req, res) => {
+    res.clearCookie('affiliate_token');
+    res.json({ message: 'Logged out successfully' });
+});
 
 // Protected (affiliate auth)
 router.get('/me', affiliateAuth, portalController.getMe);
@@ -15,4 +19,4 @@ router.get('/commissions', affiliateAuth, portalController.getCommissions);
 router.get('/creatives', affiliateAuth, portalController.getCreatives);
 router.patch('/settings', affiliateAuth, portalController.updateSettings);
 
-module.exports = router;
+export default router;

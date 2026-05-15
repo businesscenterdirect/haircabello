@@ -1,8 +1,13 @@
-const mongoose = require('mongoose');
-const User = require('../models/User');
-const emailService = require('../services/email.service');
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
+import mongoose from 'mongoose';
+import User from '../models/User.js';
+import emailService from '../services/email.service.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import 'dotenv/config';
+
+// ESM __dirname replacement
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const MONGO_URI = process.env.MONGO_URI;
 
@@ -35,7 +40,19 @@ async function verifyEnvConfig() {
     try {
         // We catch the error because Resend might still reject it if the domain isn't verified, 
         // but we want to see the logs from emailService
-        await emailService.sendEnrollmentConfirmationEmail(mockUser);
+        if (emailService.sendEnrollmentConfirmationEmail) {
+            await emailService.sendEnrollmentConfirmationEmail(mockUser);
+        } else if (emailService.sendWelcomeEmail) {
+            await emailService.sendWelcomeEmail(mockUser.email, {
+                name: mockUser.fullName,
+                password: 'TestPassword123',
+                plan: mockUser.plan,
+                price: mockUser.planPrice,
+                hairLength: '20',
+                hairType: 'straight',
+                gifts: []
+            });
+        }
     } catch (err) {
         console.log('Email delivery attempt logged (expected rejection if domain not verified).');
     }
@@ -43,7 +60,19 @@ async function verifyEnvConfig() {
     console.log('\nSimulating production environment (NODE_ENV = production)...');
     process.env.NODE_ENV = 'production';
     try {
-        await emailService.sendEnrollmentConfirmationEmail(mockUser);
+        if (emailService.sendEnrollmentConfirmationEmail) {
+            await emailService.sendEnrollmentConfirmationEmail(mockUser);
+        } else if (emailService.sendWelcomeEmail) {
+            await emailService.sendWelcomeEmail(mockUser.email, {
+                name: mockUser.fullName,
+                password: 'TestPassword123',
+                plan: mockUser.plan,
+                price: mockUser.planPrice,
+                hairLength: '20',
+                hairType: 'straight',
+                gifts: []
+            });
+        }
     } catch (err) {
         console.log('Email delivery attempt logged.');
     }

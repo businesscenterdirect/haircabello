@@ -1,10 +1,14 @@
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
+import path from 'path';
+import { fileURLToPath } from 'url';
+import 'dotenv/config';
+import mongoose from 'mongoose';
+import User from '../models/User.js';
+import memberController from '../controllers/member.controller.js';
+import adminController from '../controllers/admin.controller.js';
 
-const mongoose = require('mongoose');
-const User = require('../models/User');
-const memberController = require('../controllers/member.controller');
-const adminController = require('../controllers/admin.controller');
+// ESM __dirname replacement
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const MONGO_URI = process.env.MONGO_URI;
 

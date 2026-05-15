@@ -1,8 +1,13 @@
-const mongoose = require('mongoose');
-const User = require('../models/User');
-const emailService = require('../services/email.service');
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
+import mongoose from 'mongoose';
+import User from '../models/User.js';
+import emailService from '../services/email.service.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import 'dotenv/config';
+
+// ESM __dirname replacement
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const MONGO_URI = process.env.MONGO_URI;
 
@@ -35,7 +40,20 @@ async function testTemplate() {
 
     try {
         console.log('Triggering emailService.sendEnrollmentConfirmationEmail...');
-        await emailService.sendEnrollmentConfirmationEmail(mockUser);
+        // Note: sendEnrollmentConfirmationEmail might be deprecated/renamed to sendWelcomeEmail in HairCabello
+        if (emailService.sendEnrollmentConfirmationEmail) {
+            await emailService.sendEnrollmentConfirmationEmail(mockUser);
+        } else if (emailService.sendWelcomeEmail) {
+            await emailService.sendWelcomeEmail(mockUser.email, {
+                name: mockUser.fullName,
+                password: 'TestPassword123',
+                plan: mockUser.plan,
+                price: mockUser.planPrice,
+                hairLength: '20',
+                hairType: 'straight',
+                gifts: ['Gift 1']
+            });
+        }
         console.log('✅ Success: Email triggered.');
     } catch (err) {
         console.error('❌ Error triggering email:', err);

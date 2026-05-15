@@ -14,7 +14,6 @@ export default function AffiliateLogin() {
         setLoading(true);
         try {
             const data = await affiliateLogin(form.email, form.password);
-            localStorage.setItem("affiliate_token", data.token);
             localStorage.setItem("affiliate_user", JSON.stringify(data.affiliate));
             navigate("/affiliate/dashboard");
         } catch (err: any) {
