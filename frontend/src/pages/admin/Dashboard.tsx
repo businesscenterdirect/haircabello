@@ -115,7 +115,7 @@ const Dashboard = () => {
         <AdminLayout>
             <div className="space-y-8">
                 <div>
-                    <h2 className="text-xl font-bold text-slate-900 mb-1">Dashboard</h2>
+                    <h2 className="text-xl font-bold text-slate-900 mb-1">Dashboard 123</h2>
                     <p className="text-sm text-slate-500">Real-time overview of your Hair Cabello platform.</p>
                 </div>
 
