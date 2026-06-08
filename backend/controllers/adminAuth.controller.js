@@ -33,11 +33,12 @@ export const login = async (req, res) => {
             { expiresIn: '7d' }
         );
 
+        const isProd = process.env.NODE_ENV === 'production';
         // Set cookie
         res.cookie('admin_token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'Lax',
+            secure: isProd,
+            sameSite: isProd ? 'None' : 'Lax',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 

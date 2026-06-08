@@ -15,11 +15,12 @@ export default async (req, res, next) => {
             req.affiliateRef = affiliate;
             // Set/refresh persistent cookie if ref is in query
             if (req.query.ref) {
+                const isProd = process.env.NODE_ENV === 'production';
                 res.cookie('la_ref', refCode, {
                     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'lax'
+                    secure: isProd,
+                    sameSite: isProd ? 'None' : 'Lax'
                 });
             }
         }

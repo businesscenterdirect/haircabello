@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'https://hair-cabello.onrender.com';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://haircabello-production.up.railway.app';
 
 export interface SignupPayload {
     fullName: string;
