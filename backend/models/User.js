@@ -84,6 +84,9 @@ const UserSchema = new mongoose.Schema({
         gifts: [String],
         updatedAt: { type: Date, default: Date.now }
     },
+    notes: [{
+        type: String,
+    }],
     createdAt: {
         type: Date,
         default: Date.now,

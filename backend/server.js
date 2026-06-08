@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import './config/env.js';
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
@@ -26,16 +26,24 @@ import authRoutes from './routes/auth.routes.js';
 import memberPortalRoutes from './routes/memberPortal.routes.js';
 import adminAuthRoutes from './routes/adminAuth.routes.js';
 import phase3AdminRoutes from './routes/admin.routes.js';
+import memberRoutes from './routes/member.routes.js';
 
 const app = express();
 
 // Middleware
 app.use(morgan('combined'));
+
+const allowedOrigins = [
+    'https://haircabello.vercel.app',
+    ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : [])
+];
+
+if (process.env.APP_ENV === 'development') {
+    allowedOrigins.push('http://localhost:8080', 'http://127.0.0.1:8080');
+}
+
 app.use(cors({
-    origin: [
-        'https://hair-cabello.vercel.app',
-        ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : [])
-    ],
+    origin: allowedOrigins,
     credentials: true
 }));
 
@@ -85,6 +93,7 @@ import adminAuth from './middleware/adminAuth.middleware.js';
 app.use('/api/signup', signupRoutes);
 app.use('/api/admin', adminAuthRoutes); // Public admin login
 app.use('/api/admin/ph3', adminAuth, phase3AdminRoutes); // Protected Admin Dash Stats
+app.use('/api/members', adminAuth, memberRoutes); // Protected Admin Members CRUD
 app.use('/api/auth', authRoutes);
 app.use('/api/member', memberPortalRoutes);
 

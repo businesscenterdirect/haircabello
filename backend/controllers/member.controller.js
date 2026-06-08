@@ -130,11 +130,77 @@ export const cancelSubscription = async (req, res) => {
     }
 };
 
+export const updateMember = async (req, res) => {
+    try {
+        const { fullName, email, phone, plan, hairLength, hairType, selectedGifts, subscriptionStatus } = req.body;
+        
+        const member = await User.findOne({ _id: req.params.id, role: 'member' });
+        if (!member) return res.status(404).json({ error: 'Member not found' });
+
+        if (fullName !== undefined) member.fullName = fullName;
+        if (email !== undefined) member.email = email;
+        if (phone !== undefined) member.phone = phone;
+        if (plan !== undefined) member.plan = plan;
+        if (hairLength !== undefined) member.hairLength = hairLength;
+        if (hairType !== undefined) member.hairType = hairType;
+        if (selectedGifts !== undefined) member.selectedGifts = selectedGifts;
+        if (subscriptionStatus !== undefined) member.subscriptionStatus = subscriptionStatus;
+
+        await member.save();
+
+        await AuditLog.create({
+            userId: req.user?.id,
+            action: 'UPDATE_MEMBER',
+            targetType: 'User',
+            targetId: member._id,
+            metadata: { updatedFields: req.body }
+        });
+
+        res.json(member);
+    } catch (error) {
+        console.error('Error updating member:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const addMemberNote = async (req, res) => {
+    try {
+        const { note } = req.body;
+        if (!note || !note.trim()) {
+            return res.status(400).json({ error: 'Note content is required' });
+        }
+
+        const member = await User.findOne({ _id: req.params.id, role: 'member' });
+        if (!member) return res.status(404).json({ error: 'Member not found' });
+
+        if (!member.notes) {
+            member.notes = [];
+        }
+        member.notes.push(note);
+        await member.save();
+
+        await AuditLog.create({
+            userId: req.user?.id,
+            action: 'ADD_MEMBER_NOTE',
+            targetType: 'User',
+            targetId: member._id,
+            metadata: { note }
+        });
+
+        res.json({ message: 'Note added successfully', notes: member.notes });
+    } catch (error) {
+        console.error('Error adding member note:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 export default {
     getMe,
     updateNextOrderPreferences,
     memberCancelSubscription,
     getAllMembers,
     getMemberById,
-    cancelSubscription
+    cancelSubscription,
+    updateMember,
+    addMemberNote
 };

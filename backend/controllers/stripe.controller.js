@@ -174,6 +174,36 @@ export const getSessionDetails = async (req, res) => {
         const user = await User.findById(session.metadata?.userId);
         if (!user) return res.status(404).json({ error: 'User not found' });
 
+        let nextBillingDate = user.nextBillingDate;
+
+        // Inline Activation Fallback: If webhook hasn't processed yet but payment is completed, activate user inline
+        if (!nextBillingDate && session.payment_status === 'paid' && session.subscription) {
+            console.log(`[CORS/DEVELOPMENT] Inline activating user ${user.email} from session details query`);
+            try {
+                const subscription = await stripe.subscriptions.retrieve(session.subscription);
+                
+                // Safe extraction of current_period_end
+                const periodEnd = subscription.current_period_end || 
+                                  subscription.items?.data[0]?.current_period_end || 
+                                  (subscription.current_period_start + (30 * 24 * 60 * 60));
+                
+                nextBillingDate = new Date(periodEnd * 1000);
+                
+                user.stripeSubscriptionId = session.subscription;
+                user.stripeCustomerId = session.customer;
+                user.subscriptionStatus = 'active';
+                if (!user.activatedAt) user.activatedAt = new Date();
+                user.lastPaymentDate = new Date();
+                user.nextBillingDate = nextBillingDate;
+                user.planPrice = session.amount_total / 100;
+                
+                await user.save();
+                console.log(`[CORS/DEVELOPMENT] Inline activation successful for ${user.email}`);
+            } catch (stripeErr) {
+                console.error("Failed to inline activate user from Stripe:", stripeErr);
+            }
+        }
+
         res.json({
             name: user.fullName,
             email: user.email,
@@ -182,7 +212,7 @@ export const getSessionDetails = async (req, res) => {
             hairLength: user.hairLength,
             hairType: user.hairType,
             selectedGifts: user.selectedGifts,
-            nextBillingDate: user.nextBillingDate
+            nextBillingDate: nextBillingDate
         });
 
     } catch (error) {
